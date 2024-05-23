@@ -11,14 +11,14 @@ int main(void) {
 
   const int bsort_input_len = 0x426;
 
-  // volatile unsigned int *gDebugLedsMemoryMappedRegister = (unsigned int *)0x2000;
+  volatile unsigned int *gDebugLedsMemoryMappedRegister = (unsigned int *)0x2000;
 
   int i;
   int maxindex = bsort_input_len - 1;
 
-  // *gDebugLedsMemoryMappedRegister = 0xFF;
+  *gDebugLedsMemoryMappedRegister = 0xFFFFFFFF;
   while (maxindex > 0) {
-    // *gDebugLedsMemoryMappedRegister = ~(*gDebugLedsMemoryMappedRegister);
+    *gDebugLedsMemoryMappedRegister = ~(*gDebugLedsMemoryMappedRegister);
     for (i = 0; i < maxindex; i++) {
       if (bsort_input[i] > bsort_input[i + 1]) {
         /*		swap		*/
@@ -30,6 +30,12 @@ int main(void) {
 
     maxindex--;
   }
+  *gDebugLedsMemoryMappedRegister = 0x0;
 
-  return 0;
+  // This is a dummy wait for visual inspection
+  // for (i = 0; i < 1000000; i++) {
+  //   // do nothing
+
+  // }
+  // return 0;
 }
