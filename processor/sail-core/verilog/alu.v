@@ -145,7 +145,7 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 	end
 
 	always @(ALUctl, ALUOut, A, B) begin
-		case (ALUctl[6:4])
+		case (ALUctl[6:4]) // Matthew: This is the 3 MSBs of the ALUctl field.
 			`kSAIL_MICROARCHITECTURE_ALUCTL_6to4_BEQ:	Branch_Enable = (ALUOut == 0);
 			`kSAIL_MICROARCHITECTURE_ALUCTL_6to4_BNE:	Branch_Enable = !(ALUOut == 0);
 			`kSAIL_MICROARCHITECTURE_ALUCTL_6to4_BLT:	Branch_Enable = ($signed(A) < $signed(B));

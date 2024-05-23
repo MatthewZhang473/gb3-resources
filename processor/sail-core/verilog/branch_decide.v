@@ -45,13 +45,13 @@
 
 
 module branch_decision (Branch, Predicted, Branch_Enable, Jump, Mispredict, Decision, Branch_Jump_Trigger);
-	input	Branch;
-	input	Predicted;
-	input	Branch_Enable;
-	input	Jump;
-	output	Mispredict;
-	output	Decision;
-	output	Branch_Jump_Trigger;
+	input	Branch; // Whether the current instruction is a branch
+	input	Predicted;// Whether the branch is predicted to be taken
+	input	Branch_Enable; //Whether the conditions required to take the branch (if it's a conditional branch) are met.
+	input	Jump; // Whether the current instruction is an unconditional jump
+	output	Mispredict; // Whether the branch was mispredicted
+	output	Decision; // The decision to take the branch or not
+	output	Branch_Jump_Trigger; // Program counter needs to be updated when mispredict (false negative) or jump
 
 	assign	Branch_Jump_Trigger	= ((!Predicted) & (Branch & Branch_Enable)) | Jump;
 	assign	Decision		= (Branch & Branch_Enable);

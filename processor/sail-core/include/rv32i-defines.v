@@ -37,6 +37,8 @@
 /*
  *	7-bit RISC-V opcode field
  */
+
+ // Matthew: The opcode field of some RV32I instructions are defined here.
 `define kRV32I_INSTRUCTION_OPCODE_LUI			7'b0110111
 `define kRV32I_INSTRUCTION_OPCODE_AUIPC			7'b0010111
 `define kRV32I_INSTRUCTION_OPCODE_JAL			7'b1101111

@@ -74,5 +74,5 @@ module instruction_memory(addr, out);
 		$readmemh("verilog/program.hex",instruction_memory);
 	end
 
-	assign out = instruction_memory[addr >> 2];
+	assign out = instruction_memory[addr >> 2]; // converts the byte address into a word address by right-shifting it by two bits
 endmodule
