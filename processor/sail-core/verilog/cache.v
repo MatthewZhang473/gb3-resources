@@ -10,10 +10,10 @@ module cache (
     output reg miss
 );
 
-    parameter CACHE_SIZE = 256;  // Define cache size, here we use 256 lines
-    parameter TAG_WIDTH = 22;    // Define tag width
-    parameter INDEX_WIDTH = 8;   // Define index width
-    parameter OFFSET_WIDTH = 2;  // Define block offset width
+    parameter CACHE_SIZE = 16;  // Define cache size
+    parameter TAG_WIDTH = 26;   // Define tag width
+    parameter INDEX_WIDTH = 2;  // Define index width
+    parameter OFFSET_WIDTH = 2; // Define block offset width
 
     reg [31:0] cache_data [0:CACHE_SIZE-1];  // Cache data storage
     reg [TAG_WIDTH-1:0] tags [0:CACHE_SIZE-1]; // Cache tag storage
@@ -22,14 +22,14 @@ module cache (
     wire [INDEX_WIDTH-1:0] index;
     wire [OFFSET_WIDTH-1:0] offset;
     wire [TAG_WIDTH-1:0] tag;
-    
+
     assign index = addr[INDEX_WIDTH+OFFSET_WIDTH-1:OFFSET_WIDTH];
     assign offset = addr[OFFSET_WIDTH-1:0];
     assign tag = addr[31:INDEX_WIDTH+OFFSET_WIDTH];
 
     integer i;  // Declare loop variable as integer
 
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin
             for (i = 0; i < CACHE_SIZE; i = i + 1) begin
                 valid[i] <= 1'b0;
