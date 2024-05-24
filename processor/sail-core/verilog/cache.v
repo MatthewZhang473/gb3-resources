@@ -11,9 +11,9 @@ module cache (
 );
 
     parameter CACHE_SIZE = 16;  // Define cache size
-    parameter TAG_WIDTH = 26;   // Define tag width
-    parameter INDEX_WIDTH = 2;  // Define index width
-    parameter OFFSET_WIDTH = 2; // Define block offset width
+    parameter TAG_WIDTH = 26;   // Define tag width = Total address bits (usually 32) - INDEX_WIDTH - OFFSET_WIDTH.
+    parameter INDEX_WIDTH = 4;  // Define index width  = log2(CACHE_SIZE).
+    parameter OFFSET_WIDTH = 2; // Define block offset width = log2(block size), where block size = 2^OFFSET_WIDTH.
 
     reg [31:0] cache_data [0:CACHE_SIZE-1];  // Cache data storage
     reg [TAG_WIDTH-1:0] tags [0:CACHE_SIZE-1]; // Cache tag storage
