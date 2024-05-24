@@ -39,24 +39,13 @@
 /*
  *	Description:
  *
- *		This module implements an adder for use by the branch unit
- *		and program counter increment among other things.
+ *		This module implements an DSP based 32 bits subtractor for use in ALU.
  */
 
 
-
-// module adder(input1, input2, out);
-// 	input [31:0]	input1;
-// 	input [31:0]	input2;
-// 	output [31:0]	out;
-
-// 	assign		out = input1 + input2;
-// endmodule
-
-module dsp_adder(
+module dsp_subtractor(
     input [31:0] input1,          // 32-bit input 1
     input [31:0] input2,          // 32-bit input 2
-	// input add_sub,                // 0 for add, 1 for subtract
     output wire [31:0] out         // 32-bit output
 );
 
@@ -91,10 +80,10 @@ module dsp_adder(
 		.OHOLDBOT(1'b0),
 		.OLOADTOP(1'b0),
 		.OLOADBOT(1'b0),
-		.ADDSUBTOP(1'b0), // 0 for add, 1 for subtract
-		.ADDSUBBOT(1'b0), // 0 for add, 1 for subtract
+		.ADDSUBTOP(1'b1), // subtract
+		.ADDSUBBOT(1'b1), // subtract
 		.CO(), // check, do we need to connect this carry bit out?
-		.CI(1'b0),
+		.CI(1'b0), // no carry in
 		.ACCUMCI(),
 		.ACCUMCO(),
 		.SIGNEXTIN(),
@@ -112,10 +101,10 @@ module dsp_adder(
 	defparam i_sbmac16.PIPELINE_16x16_MULT_REG1 = 1'b0;
 	defparam i_sbmac16.PIPELINE_16x16_MULT_REG2 = 1'b0;
 
-	defparam i_sbmac16.TOPOUTPUT_SELECT = 2'b00; //adder, not registered
+	defparam i_sbmac16.TOPOUTPUT_SELECT = 2'b00; //subtractor, not registered
 	defparam i_sbmac16.TOPADDSUB_LOWERINPUT = 2'b00;
 	defparam i_sbmac16.TOPADDSUB_UPPERINPUT = 1'b0;
-	defparam i_sbmac16.TOPADDSUB_CARRYSELECT = 2'b11; // carry bit from the lower adder
+	defparam i_sbmac16.TOPADDSUB_CARRYSELECT = 2'b11; // carry bit from the lower subtractor
 
 	defparam i_sbmac16.BOTOUTPUT_SELECT = 2'b00;
 	defparam i_sbmac16.BOTADDSUB_LOWERINPUT = 2'b00;

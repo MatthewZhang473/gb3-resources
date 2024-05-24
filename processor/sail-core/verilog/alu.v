@@ -61,6 +61,25 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 	output reg [31:0]	ALUOut;
 	output reg		Branch_Enable;
 
+	// Output of the DSP block
+	wire [31:0]     dsp_adder_result;
+	wire [31:0]     dsp_subtractor_result;
+
+	// Instance of dsp_adder to perform addition
+	// TODO: add enable signal to this adder to avoid unnecessary power consumption
+    dsp_adder adder_unit(
+        .input1(A),
+        .input2(B),
+        .out(dsp_adder_result)
+    );
+	// Instance of dsp_adder to perform subtraction
+	// TODO: add enable signal to this adder to avoid unnecessary power consumption
+	dsp_subtractor subtractor_unit(
+		.input1(A),
+		.input2(B),
+		.out(dsp_subtractor_result)
+	);
+	
 	/*
 	 *	This uses Yosys's support for nonzero initial values:
 	 *
@@ -90,12 +109,12 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 			/*
 			 *	ADD (the fields also match AUIPC, all loads, all stores, and ADDI)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_ADD:	ALUOut = A + B;
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_ADD:	ALUOut = dsp_adder_result;
 
 			/*
 			 *	SUBTRACT (the fields also matches all branches)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SUB:	ALUOut = A - B;
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SUB:	ALUOut = dsp_subtractor_result;
 
 			/*
 			 *	SLT (the fields also matches all the other SLT variants)
