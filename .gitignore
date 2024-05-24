@@ -25,3 +25,4 @@
 **/*.map
 .DS_Store
 **/Archive
+*.pyc
