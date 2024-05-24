@@ -1,40 +1,51 @@
 module branch_predictor(
-		clk,
-        reset,
-		actual_branch_decision,
-		branch_decode_sig,
-		branch_mem_sig,
-		in_addr,
+        clk,
+        actual_branch_decision,
+        branch_decode_sig,
+        branch_mem_sig,
+        in_addr,
         offset,
-		branch_addr,
-		prediction
-	);
+        branch_addr,
+        prediction
+    );
 
-	/*
-	 *	inputs
-	 */
+    /*
+     *  inputs
+     */
     input        clk;
-    input        reset;
     input        actual_branch_decision;
     input        branch_decode_sig;
     input        branch_mem_sig;
     input [31:0] in_addr;
     input [31:0] offset;
 
-	/*
+    /*
      *  outputs
-	 */
-    output wire [31:0] branch_addr;
+     */
+    output wire [31:0] branch_addr;  // Use wire for combinational logic
     output reg        prediction;
 
-	/*
+    /*
      *  Gshare Predictor Components
-	 */
+     */
     reg [7:0] GHR;  // 8-bit Global History Register
     reg [1:0] PHT[255:0];  // 256-entry Pattern History Table, each with a 2-bit saturating counter
 
     wire [7:0] pht_index;
-    wire [1:0] current_prediction;
+    
+    /*
+     *  Initial block to initialize PHT to weakly not taken state
+     *  Note: The initial block is synthesizable in some FPGAs and ASICs but not in all.
+     *  Ensure your synthesis tool supports it or use another method for initialization.
+     */
+    integer i;
+    initial begin
+        GHR = 8'b0;
+        for (i = 0; i < 256; i = i + 1) begin
+            PHT[i] = 2'b01;  // Initialize PHT to weakly not taken state
+        end
+    end
+
 
     /*
      *  Calculate PHT index using XOR of GHR and lower bits of in_addr
@@ -50,16 +61,10 @@ module branch_predictor(
      *  Access current prediction from PHT
      */
     always @(posedge clk) begin
-        if (reset) begin
-            GHR <= 8'b0;
-            prediction <= 0;
-        end 
-        else begin
-            prediction <= PHT[pht_index][1] & branch_decode_sig;
-        end
-	end
+        prediction <= PHT[pht_index][1] & branch_decode_sig;
+    end
 
-	/*
+    /*
      *  Update GHR and PHT based on actual branch decision
      */
     always @(negedge clk) begin
@@ -75,7 +80,7 @@ module branch_predictor(
                 if (PHT[pht_index] != 2'b00)
                     PHT[pht_index] <= PHT[pht_index] - 1;
             end
-		end
-	end
+        end
+    end
 
 endmodule
