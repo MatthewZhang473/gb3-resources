@@ -24,3 +24,4 @@
 **/*.sr
 **/*.map
 .DS_Store
+**/Archive
