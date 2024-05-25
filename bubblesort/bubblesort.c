@@ -32,10 +32,10 @@ int main(void) {
   }
   *gDebugLedsMemoryMappedRegister = 0x0;
 
-  // This is a dummy wait for visual inspection
+  // //This is a dummy wait for visual inspection
   // for (i = 0; i < 1000000; i++) {
   //   // do nothing
 
   // }
-  // return 0;
+  return 0;
 }
