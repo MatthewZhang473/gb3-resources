@@ -53,22 +53,24 @@
 // 	assign		out = input1 + input2;
 // endmodule
 
-module dsp_adder(
+module dsp_add_sub(
     input [31:0] input1,          // 32-bit input 1
     input [31:0] input2,          // 32-bit input 2
-	// input add_sub,                // 0 for add, 1 for subtract
+	input add_sub,                // 0 for add, 1 for subtract
     output wire [31:0] out         // 32-bit output
 );
 
 	// Internal connections for DSP block
 	wire [15:0] A, B, C, D;
 	wire [31:0] O;
+	wire add_sub_flag;
 
 	// Assign inputs to 16-bit segments for DSP processing
-	assign A = input1[15:0];
-	assign B = input1[31:16];
-	assign C = input2[15:0];
-	assign D = input2[31:16];
+	assign A = input1[31:16];
+	assign B = input1[15:0];
+	assign C = input2[31:16];
+	assign D = input2[15:0];
+	assign add_sub_flag = add_sub;
 
 	SB_MAC16 i_sbmac16
 		( // port interfaces
@@ -83,16 +85,16 @@ module dsp_adder(
 		.IRSTBOT(1'b0),
 		.ORSTTOP(1'b0),
 		.ORSTBOT(1'b0),
-		.AHOLD(1'b0),
-		.BHOLD(1'b0),
-		.CHOLD(1'b0),
-		.DHOLD(1'b0),
-		.OHOLDTOP(1'b0),
-		.OHOLDBOT(1'b0),
+		.AHOLD(1'b1),
+		.BHOLD(1'b1),
+		.CHOLD(1'b1),
+		.DHOLD(1'b1),
+		.OHOLDTOP(1'b1),
+		.OHOLDBOT(1'b1),
 		.OLOADTOP(1'b0),
 		.OLOADBOT(1'b0),
-		.ADDSUBTOP(1'b0), // 0 for add, 1 for subtract
-		.ADDSUBBOT(1'b0), // 0 for add, 1 for subtract
+		.ADDSUBTOP(add_sub_flag), // 0 for add, 1 for subtract
+		.ADDSUBBOT(add_sub_flag), // 0 for add, 1 for subtract
 		.CO(), // check, do we need to connect this carry bit out?
 		.CI(1'b0),
 		.ACCUMCI(),
@@ -114,12 +116,12 @@ module dsp_adder(
 
 	defparam i_sbmac16.TOPOUTPUT_SELECT = 2'b00; //adder, not registered
 	defparam i_sbmac16.TOPADDSUB_LOWERINPUT = 2'b00;
-	defparam i_sbmac16.TOPADDSUB_UPPERINPUT = 1'b0;
+	defparam i_sbmac16.TOPADDSUB_UPPERINPUT = 1'b1; // Load input from C to the adder
 	defparam i_sbmac16.TOPADDSUB_CARRYSELECT = 2'b11; // carry bit from the lower adder
 
 	defparam i_sbmac16.BOTOUTPUT_SELECT = 2'b00;
 	defparam i_sbmac16.BOTADDSUB_LOWERINPUT = 2'b00;
-	defparam i_sbmac16.BOTADDSUB_UPPERINPUT = 1'b0;
+	defparam i_sbmac16.BOTADDSUB_UPPERINPUT = 1'b1; // Load input from D to the adder
 	defparam i_sbmac16.BOTADDSUB_CARRYSELECT = 2'b00; // no need for carry bit
 	defparam i_sbmac16.MODE_8x8 = 1'b0;
 	

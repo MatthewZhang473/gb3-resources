@@ -182,10 +182,10 @@ module cpu(
 			.out(pc_in)
 		);
 
-	dsp_adder pc_adder(
-			// .clk(clk),
+	dsp_add_sub pc_adder(
 			.input1(32'b100),
 			.input2(pc_out),
+			.add_sub(1'b0),
 			.out(pc_adder_out)
 		);
 
@@ -332,10 +332,10 @@ module cpu(
 			.out(addr_adder_mux_out)
 		);
 
-	dsp_adder addr_adder(
-			// .clk(clk),
+	dsp_add_sub addr_adder(
 			.input1(addr_adder_mux_out),
 			.input2(id_ex_out[139:108]),
+			.add_sub(1'b0),
 			.out(addr_adder_sum)
 		);
 
