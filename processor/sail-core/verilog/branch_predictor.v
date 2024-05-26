@@ -107,6 +107,5 @@ module branch_predictor(
 
 	// Replacing the addition operation with the DSP adder
 	assign branch_addr = in_addr + offset;
-	// assign branch_addr = in_addr + offset;
 	assign prediction = s[1] & branch_decode_sig;
 endmodule
