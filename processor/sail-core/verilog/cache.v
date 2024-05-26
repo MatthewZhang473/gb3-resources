@@ -19,6 +19,16 @@ module cache (
     reg [TAG_WIDTH-1:0] tags [0:CACHE_SIZE-1]; // Cache tag storage
     reg valid [0:CACHE_SIZE-1];  // Valid bits storage
 
+    /*
+	 *	Sets one entry of cache_data, tags, and valid to 0
+	 */
+	initial begin
+		regfile[0] = 32'b0;
+        tags[0] = TAG_WIDTH'b0;
+        valid[0] = 1'b0;
+	end
+
+    
     wire [INDEX_WIDTH-1:0] index;
     wire [OFFSET_WIDTH-1:0] offset;
     wire [TAG_WIDTH-1:0] tag;
@@ -29,7 +39,10 @@ module cache (
 
     integer i;  // Declare loop variable as integer
 
+
+//
     always @(posedge clk) begin
+
         if (reset) begin
             for (i = 0; i < CACHE_SIZE; i = i + 1) begin
                 valid[i] <= 1'b0;
