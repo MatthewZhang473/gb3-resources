@@ -131,7 +131,16 @@ module cpu(
 	wire [31:0]		alu_mux_out;
 	wire [31:0]		addr_adder_sum;
 	wire [6:0]		alu_ctl;
-	wire			alu_branch_enable;
+	wire			alu_branch_enable_1;
+	wire 			adu_result_1;
+	wire			addition_flag;
+	wire 			carry_bit;
+	wire [15:0] 	last_16_bits_result;
+
+
+	/*
+	 *	ALUEX stage
+	 */
 	wire [31:0]		alu_result;
 	wire [31:0]		lui_result;
 
@@ -344,26 +353,84 @@ module cpu(
 			.out(alu_mux_out)
 		);
 
-	alu alu_main(
-			.ALUctl(id_ex_out[146:140]),
-			.A(wb_fwd1_mux_out),
-			.B(alu_mux_out),
-			.ALUOut(alu_result),
-			.Branch_Enable(alu_branch_enable)
+	alu_stage_one alu_stage_one_inst(
+		.ALUctl(id_ex_out[146:140]),
+		.A(wb_fwd1_mux_out),
+		.B(alu_mux_out),
+		.ALUOut(adu_result_1),
+		.Branch_Enable(alu_branch_enable_1)
+		.addition_flag(addition_flag),
+		.carry_bit(carry_bit),
+		.last_16_bits_result(last_16_bits_result)
+	);	
+
+
+	//EX/MEM Pipeline Register
+	// ex_mem ex_mem_reg(
+	// 		.clk(clk),
+	// 		.data_in({id_ex_out[177:166], id_ex_out[155:151], wb_fwd2_mux_out, lui_result, alu_branch_enable, addr_adder_sum, id_ex_out[43:12], ex_cont_mux_out[8:0]}),
+	// 		.data_out(ex_mem_out)
+	// 	);
+
+	// EX/ALUEX Pipeline Register
+	ex_aluex ex_aluex_reg(
+			.clk(clk),
+			// Put the information we need for ALU2 and LUi here
+			// Concatinate the following
+			// For ALU2
+			// A - wb_fwd1_mux_out: 32 bits
+			// B - alu_mux_out: 32 bits
+			// ALUOut_1 - adu_result_1: 32 bits
+			// Branch_Enable_1 - alu_branch_enable_1: 1 bit
+			// addition_flag - addition_flag: 1 bit
+			// carry_bit - carry_bit: 1 bit
+			// last_16_bits_result - last_16_bits_result: 16 bits
+			// For LUI
+			// id_ex_out[139:108]: 32 bits
+			// id_ex_out[9]: 1 bit
+			// A total of 32+32+32+1+1+1+16+32+1 = 148 bits
+			.data_in({wb_fwd1_mux_out, alu_mux_out,
+					  adu_result_1, alu_branch_enable_1,
+					  addition_flag, carry_bit, last_16_bits_result,
+					  id_ex_out[139:108], id_ex_out[9]}),
+			.data_out(ex_aluex_out)
 		);
+
+
+	// alu alu_main(
+	// 		.ALUctl(id_ex_out[146:140]),
+	// 		.A(wb_fwd1_mux_out),
+	// 		.B(alu_mux_out),
+	// 		.ALUOut(alu_result),
+	// 		.Branch_Enable(alu_branch_enable)
+	// 	);
+
+	//I may need to change the input of ALU stage 2 and lui_mux according to ex_aluex register
+
+	alu_stage_two alu_stage_two_inst(
+		.A(ex_aluex_out[31:0]), // A
+		.B(ex_aluex_out[63:32]), // B
+		.ALUOut_1(ex_aluex_out[95:64]), // ALUOut_1
+		.Branch_Enable1(ex_aluex_out[96]), // Branch_Enable_1
+		.addition_flag(ex_aluex_out[97]), // addition_flag
+		.carry_bit(ex_aluex_out[98]), // carry_bit
+		.last_16_bits_result(ex_aluex_out[114:99]), // last_16_bits_result
+		.ALUOut(alu_result),
+		.Branch_Enable(alu_branch_enable)
+	);
 
 	mux2to1 lui_mux(
 			.input0(alu_result),
-			.input1(id_ex_out[139:108]),
-			.select(id_ex_out[9]),
+			.input1(ex_aluex_out[146:115]), // originaly id_ex_out[139:108]
+			.select(ex_aluex_out[115]), // originaly id_ex_out[9]
 			.out(lui_result)
 		);
 
-	//EX/MEM Pipeline Register
-	ex_mem ex_mem_reg(
+	// ALUEX/MEM Pipeline Register
+	aluex_mem aluex_mem_reg(
 			.clk(clk),
 			.data_in({id_ex_out[177:166], id_ex_out[155:151], wb_fwd2_mux_out, lui_result, alu_branch_enable, addr_adder_sum, id_ex_out[43:12], ex_cont_mux_out[8:0]}),
-			.data_out(ex_mem_out)
+			.data_out(aluex_mem_out)
 		);
 
 	//Memory Access Stage

@@ -120,6 +120,40 @@ module ex_mem (clk, data_in, data_out);
 	end
 endmodule
 
+// New stage: ALUEX
+
+module ex_aluex (clk, data_in, data_out);
+	// 334 is just a temporary value
+	input			clk;
+	input [147:0]		data_in;
+	output reg[147:0]	data_out;
+
+
+	initial begin
+		data_out = 148'b0;
+	end
+
+	always @(posedge clk) begin
+		data_out <= data_in;
+	end
+endmodule
+
+
+
+module aluex_mem (clk, data_in, data_out);
+	input			clk;
+	input [154:0]		data_in;
+	output reg[154:0]	data_out;
+
+	initial begin
+		data_out = 155'b0;
+	end
+
+	always @(posedge clk) begin
+		data_out <= data_in;
+	end
+endmodule
+
 
 
 /* MEM/WB pipeline registers */ 
