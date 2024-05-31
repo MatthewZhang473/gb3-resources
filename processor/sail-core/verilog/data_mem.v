@@ -196,24 +196,6 @@ module data_mem (clk, addr, write_data, memwrite, memread, sign_mask, read_data,
         end
     end
 
-    /*
-     * Cache instance
-     */
-    wire [31:0] cache_read_data;
-    wire cache_hit;
-    wire cache_miss;
-
-    cache cache_inst (
-        .clk(clk),
-        .reset(1'b0),
-        .memwrite(memwrite),
-        .memread(memread),
-        .addr(addr),
-        .write_data(write_data),
-        .read_data(cache_read_data),
-        .hit(cache_hit),
-        .miss(cache_miss)
-    );
 
     /*
      * State machine
@@ -228,24 +210,8 @@ module data_mem (clk, addr, write_data, memwrite, memread, sign_mask, read_data,
                 addr_buf <= addr;
                 sign_mask_buf <= sign_mask;
 
-                if(memwrite==1'b1 || memread==1'b1) begin
-                    if (cache_hit && memread_buf == 1'b1 ) begin // We may be able to read from cache (not write!)
-                        state <= READ;
-                        word_buf <= cache_read_data;
-                    end else begin
-                        state <= READ_BUFFER;
-                    end
-                    clk_stall <= 1;
-                end
-            end
-
-            READ_BUFFER: begin
-				/*
-				 *	Subtract out the size of the instruction memory.
-				 *	(Bad practice: The constant should be a `define).
-				 */
-                word_buf <= data_block[addr_buf_block_addr - 32'h1000]; // Matthew: I don't think we need to do this if writing data
                 if(memread_buf==1'b1) begin
+                    word_buf <= data_block[addr_buf_block_addr - 32'h1000]; // Only read from memory if we are reading
                     state <= READ;
                 end
 				else if(memwrite_buf == 1'b1) begin
