@@ -46,9 +46,31 @@
 
 
 module adder(input1, input2, out);
-	input [31:0]	input1;
-	input [31:0]	input2;
-	output [31:0]	out;
+    input [31:0] input1, input2;
+    output [31:0] out;
+    wire [31:0] g, p, c;
 
-	assign		out = input1 + input2;
+    // Generate and propagate
+    genvar i;
+    generate
+        for (i = 0; i < 32; i = i + 1) begin : gen_prop
+            assign g[i] = input1[i] & input2[i];  // Generate
+            assign p[i] = input1[i] ^ input2[i];  // Propagate
+        end
+    endgenerate
+
+    // Carry generation using lookahead technique
+    assign c[0] = 0;  // No carry input for the least significant bit
+    generate
+        for (i = 1; i < 32; i = i + 1) begin : carry_gen
+            assign c[i] = g[i-1] | (p[i-1] & c[i-1]);
+        end
+    endgenerate
+
+    // Compute sum
+    generate
+        for (i = 0; i < 32; i = i + 1) begin : sum_gen
+            assign out[i] = p[i] ^ c[i];
+        end
+    endgenerate
 endmodule
