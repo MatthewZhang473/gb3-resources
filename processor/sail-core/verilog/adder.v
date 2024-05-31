@@ -1,54 +1,42 @@
-/*
-	Authored 2018-2019, Ryan Voo.
-
-	All rights reserved.
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions
-	are met:
-
-	*	Redistributions of source code must retain the above
-		copyright notice, this list of conditions and the following
-		disclaimer.
-
-	*	Redistributions in binary form must reproduce the above
-		copyright notice, this list of conditions and the following
-		disclaimer in the documentation and/or other materials
-		provided with the distribution.
-
-	*	Neither the name of the author nor the names of its
-		contributors may be used to endorse or promote products
-		derived from this software without specific prior written
-		permission.
-
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-	FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-	INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-	BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-	CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-	LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
-
-
-
-/*
- *	Description:
- *
- *		This module implements an adder for use by the branch unit
- *		and program counter increment among other things.
- */
-
-
-
 module adder(input1, input2, out);
-	input [31:0]	input1;
-	input [31:0]	input2;
-	output [31:0]	out;
+    input [31:0] input1;
+    input [31:0] input2;
+    output reg [31:0] out;
 
-	assign		out = input1 + input2;
+    wire [15:0] lower_part, upper_part_no_carry, upper_part_with_carry;
+    wire carry_from_lower;
+
+    // Calculate the lower 16 bits
+    adder16 adder_bot (
+        .input1(input1[15:0]),
+        .input2(input2[15:0]),
+        .carry_in(1'b0),
+        .out(lower_part),
+        .carry_out(carry_from_lower)
+    );
+
+    // Calculate the upper 16 bits without carry from the lower 16 bits
+    adder16 adder_top_no_carry (
+        .input1(input1[31:16]),
+        .input2(input2[31:16]),
+        .carry_in(1'b0),
+        .out(upper_part_no_carry),
+        .carry_out()
+    );
+
+    // Calculate the upper 16 bits with carry from the lower 16 bits
+    adder16 adder_top_with_carry (
+        .input1(input1[31:16]),
+        .input2(input2[31:16]),
+        .carry_in(1'b1),
+        .out(upper_part_with_carry),
+        .carry_out()
+    );
+
+    // Decide the output based on the carry from the lower 16 bits
+	always @(lower_part or carry_from_lower or upper_part_no_carry or upper_part_with_carry) begin
+		out[15:0] = lower_part;
+		out[31:16] = carry_from_lower ? upper_part_with_carry : upper_part_no_carry;
+	end
+
 endmodule
