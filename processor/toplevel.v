@@ -103,5 +103,6 @@ module top (led);
 			.clk_stall(data_clk_stall)
 		);
 
-	assign clk_proc = (data_clk_stall) ? 1'b1 : clk;
+	// assign clk_proc = (data_clk_stall) ? 1'b1 : clk;
+	assign clk_proc = data_clk_stall || clk; // This may be faster
 endmodule
