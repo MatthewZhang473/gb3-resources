@@ -30,7 +30,11 @@ module top(led);
       .REFERENCECLK(clk_48mhz)
    );
 
-	always @(posedge clk_16mhz) begin
+   /*
+      For testing: we blink the LED at two different frequencies.
+      And visually compare the two frequencies.
+      */
+	always @(posedge clk_16mhz) begin 
 		if (count > `kFofE_HFOSC_CLOCK_DIVIDER_FOR_1Hz) begin
 			LEDstatus <= !LEDstatus;
 			count <= 0;
