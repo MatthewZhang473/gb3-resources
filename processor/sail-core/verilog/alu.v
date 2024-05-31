@@ -125,17 +125,17 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 			/*
 			 *	SRL (the fields also matches the other SRL variants)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SRL:	ALUOut = dsp_adder_result;
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SRL:	ALUOut = A >> B[4:0];
 
 			/*
 			 *	SRA (the fields also matches the other SRA variants)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SRA:	ALUOut = dsp_adder_result;
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SRA:	ALUOut = $signed(A) >>> B[4:0];
 
 			/*
 			 *	SLL (the fields also match the other SLL variants)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SLL:	ALUOut = dsp_adder_result;
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SLL:	ALUOut = A << B[4:0];
 
 			/*
 			 *	XOR (the fields also match other XOR variants)
