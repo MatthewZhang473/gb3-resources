@@ -96,7 +96,7 @@ module dsp_add_sub(
 		.ADDSUBTOP(add_sub_flag), // 0 for add, 1 for subtract
 		.ADDSUBBOT(add_sub_flag), // 0 for add, 1 for subtract
 		.CO(), // check, do we need to connect this carry bit out?
-		.CI(1'b0),
+		.CI(add_sub_flag), // Richard: need a carry in for subtraction because we are using 2's complement
 		.ACCUMCI(),
 		.ACCUMCO(),
 		.SIGNEXTIN(),
@@ -128,7 +128,10 @@ module dsp_add_sub(
 	defparam i_sbmac16.A_SIGNED = 1'b0;
 	defparam i_sbmac16.B_SIGNED = 1'b0;
 
-	// Since operation is not clock dependent, output can be assigned directly
-	assign out = O;
+	// Richard: need to invert the output if we are subtracting.
+	if (add_sub == 0)
+		assign out = O;
+	else
+		assign out = ~O;
 
 endmodule
