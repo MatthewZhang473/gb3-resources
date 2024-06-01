@@ -63,7 +63,7 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 
 	// Output of the DSP block
 	wire [31:0]     dsp_adder_result;
-	// wire [31:0]     dsp_subtractor_result;
+	wire [31:0]     dsp_subtractor_result;
 
 	// Instance of dsp_adder to perform addition
     dsp_add_sub adder_unit(
@@ -78,13 +78,6 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 		.add_sub(1'b1),
 		.out(dsp_subtractor_result)
 	);
-	// // Instance of dsp_adder to perform subtraction
-	// // TODO: add enable signal to this adder to avoid unnecessary power consumption
-	// dsp_subtractor subtractor_unit(
-	// 	.input1(A),
-	// 	.input2(B),
-	// 	.out(dsp_subtractor_result)
-	// );
 	
 	/*
 	 *	This uses Yosys's support for nonzero initial values:
