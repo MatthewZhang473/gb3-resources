@@ -210,12 +210,15 @@ module data_mem (clk, addr, write_data, memwrite, memread, sign_mask, read_data,
                 addr_buf <= addr;
                 sign_mask_buf <= sign_mask;
 
-                if(memread_buf==1'b1) begin
-                    word_buf <= data_block[addr_buf_block_addr - 32'h1000]; // Only read from memory if we are reading
+                if(memread==1'b1) begin
+                    word_buf <= data_block[addr[11:2] - 32'h1000]; // Only read from memory if we are reading
                     state <= READ;
+                    clk_stall <= 1;
                 end
-				else if(memwrite_buf == 1'b1) begin
+				else if(memwrite == 1'b1) begin
+                    word_buf <= data_block[addr[11:2] - 32'h1000];
                     state <= WRITE;
+                    clk_stall <= 1;
                 end
             end
 
