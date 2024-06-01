@@ -58,6 +58,7 @@ module instruction_memory (
 
     // Internal address register to hold the previous address
     reg [31:0] previous_addr;
+    reg [31:0] addr_buf;
 
     // Memory initialization (using Yosys's support for nonzero initial values)
     initial begin
@@ -71,6 +72,7 @@ module instruction_memory (
         case (state)
             IDLE: begin
                 clk_stall <= 0;
+                addr_buf <= addr; // Store the current address
                 if (addr != previous_addr) begin
                     previous_addr <= addr; // Update the previous address
                     state <= FETCH; // Move to fetch state if address changes
@@ -80,7 +82,7 @@ module instruction_memory (
 
             FETCH: begin
 				clk_stall <= 0;
-                out <= instruction_memory[addr >> 2]; // Perform the memory read
+                out <= instruction_memory[addr_buf >> 2]; // Perform the memory read
                 state <= IDLE; // Go back to idle state
             end
         endcase
