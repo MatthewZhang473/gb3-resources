@@ -102,7 +102,7 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 			/*
 			 *	SUBTRACT (the fields also matches all branches)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SUB:	ALUOut = Out; // this is wrong, will fix later
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SUB:	ALUOut = A - B; // this is wrong, will fix later
 
 			/*
 			 *	SLT (the fields also matches all the other SLT variants)
