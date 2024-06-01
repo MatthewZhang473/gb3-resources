@@ -66,13 +66,18 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 	// wire [31:0]     dsp_subtractor_result;
 
 	// Instance of dsp_adder to perform addition
-	// TODO: add enable signal to this adder to avoid unnecessary power consumption
     dsp_add_sub adder_unit(
         .input1(A),
         .input2(B),
 		.add_sub(1'b0),
         .out(dsp_adder_result)
     );
+	dsp_add_sub subtractor_unit(
+		.input1(A),
+		.input2(~B),
+		.add_sub(1'b1),
+		.out(dsp_subtractor_result)
+	);
 	// // Instance of dsp_adder to perform subtraction
 	// // TODO: add enable signal to this adder to avoid unnecessary power consumption
 	// dsp_subtractor subtractor_unit(
@@ -115,7 +120,7 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 			/*
 			 *	SUBTRACT (the fields also matches all branches)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SUB:	ALUOut = A - B;
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SUB:	ALUOut = dsp_subtractor_result;
 
 			/*
 			 *	SLT (the fields also matches all the other SLT variants)
