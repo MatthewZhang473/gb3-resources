@@ -86,8 +86,15 @@ module top (led);
 		.data_mem_sign_mask(data_sign_mask)
 	);
 
+	reg [31:0] fake_read;
+	reg [31:0] fake_write;
 	instruction_memory inst_mem( 
+		.clk(clk),
 		.addr(inst_in), 
+		.fake_condition(0),
+		.fake_addr(0),
+		.fake_read(fake_read),
+		.fake_write(fake_write),
 		.out(inst_out)
 	);
 
