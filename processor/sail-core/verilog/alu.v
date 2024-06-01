@@ -79,7 +79,13 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 	adder adder (
 		.input1(A),
 		.input2(B),
-		.out(Out)
+		.out(adder_result)
+	);
+
+	subtractor subtractor (
+		.input1(A),
+		.input2(B),
+		.out(subtractor_result)
 	);
 
 	always @(ALUctl, A, B) begin
@@ -97,12 +103,12 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 			/*
 			 *	ADD (the fields also match AUIPC, all loads, all stores, and ADDI)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_ADD:	ALUOut = Out;
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_ADD:	ALUOut = adder_result;
 
 			/*
 			 *	SUBTRACT (the fields also matches all branches)
 			 */
-			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SUB:	ALUOut = A - B; // this is wrong, will fix later
+			`kSAIL_MICROARCHITECTURE_ALUCTL_3to0_SUB:	ALUOut = subtractor_result;
 
 			/*
 			 *	SLT (the fields also matches all the other SLT variants)
