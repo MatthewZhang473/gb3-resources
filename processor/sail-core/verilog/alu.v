@@ -73,8 +73,8 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
         .out(dsp_adder_result)
     );
 	dsp_add_sub subtractor_unit(
-		.input1(A),
-		.input2(~B),
+		.input1(~A),
+		.input2(B),
 		.add_sub(1'b1),
 		.out(dsp_subtractor_result)
 	);

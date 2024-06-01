@@ -11,13 +11,13 @@ module blink(led);
     wire [31:0] adder_input1;
     wire [31:0] adder_input2;
 
-    assign adder_input1 = 32'hFFFFFFFF;
-    assign adder_input2 = 32'h00000000;
+    assign adder_input1 = 32'h00000001;
+    assign adder_input2 = 32'h00000002;
 
     dsp_add_sub adder_inst (
         .input1(adder_input1),
-        .input2(~adder_input2),
-		.add_sub(1'b1),
+        .input2(adder_input2),
+		.add_sub(1'b0),
         .out(adder_out)
     );
 
@@ -37,7 +37,7 @@ module blink(led);
 	 * otherwise (when the result is correct), keep the LED on
 	 */
 	always @(posedge clk) begin
-		if (adder_out != 32'h00000001) begin
+		if (adder_out != 32'h00000003) begin
 			if (count > `kFofE_HFOSC_CLOCK_DIVIDER_FOR_1Hz) begin
 				LEDstatus <= !LEDstatus;
 				count <= 0;
