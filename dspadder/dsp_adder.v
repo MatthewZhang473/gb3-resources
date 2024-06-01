@@ -93,10 +93,10 @@ module dsp_add_sub(
 		.OHOLDBOT(1'b1),
 		.OLOADTOP(1'b0),
 		.OLOADBOT(1'b0),
-		.ADDSUBTOP(add_sub_flag), // 0 for add, 1 for subtract
-		.ADDSUBBOT(add_sub_flag), // 0 for add, 1 for subtract
+		.ADDSUBTOP(1'b0), // 0 for add, 1 for subtract
+		.ADDSUBBOT(1'b0), // 0 for add, 1 for subtract
 		.CO(), // check, do we need to connect this carry bit out?
-		.CI(add_sub_flag), // Richard: need a carry in for subtraction because we are using 2's complement
+		.CI(1'b0), // Richard: need a carry in for subtraction because we are using 2's complement
 		.ACCUMCI(),
 		.ACCUMCO(),
 		.SIGNEXTIN(),
@@ -122,16 +122,14 @@ module dsp_add_sub(
 	defparam i_sbmac16.BOTOUTPUT_SELECT = 2'b00;
 	defparam i_sbmac16.BOTADDSUB_LOWERINPUT = 2'b00;
 	defparam i_sbmac16.BOTADDSUB_UPPERINPUT = 1'b1; // Load input from D to the adder
-	defparam i_sbmac16.BOTADDSUB_CARRYSELECT = 2'b00; // no need for carry bit
+	defparam i_sbmac16.BOTADDSUB_CARRYSELECT = 2'b11; // carry in 1 when subtracting
 	defparam i_sbmac16.MODE_8x8 = 1'b0;
 	
 	defparam i_sbmac16.A_SIGNED = 1'b0;
 	defparam i_sbmac16.B_SIGNED = 1'b0;
 
 	// Richard: need to invert the output if we are subtracting.
-	if (add_sub == 0)
-		assign out = O;
-	else
-		assign out = ~O;
+
+	assign out = add_sub_flag ? ~O : O;
 
 endmodule
