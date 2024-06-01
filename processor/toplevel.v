@@ -46,6 +46,7 @@ module top (led);
 
 	wire		clk_proc;
 	wire		data_clk_stall;
+	wire        intr_clk_stall;
 	
 	wire		clk;
 	reg		ENCLKHF		= 1'b1;	// Plock enable
@@ -87,8 +88,10 @@ module top (led);
 	);
 
 	instruction_memory inst_mem( 
+		.clk(clk),
 		.addr(inst_in), 
-		.out(inst_out)
+		.out(inst_out),
+		.clk_stall(intr_clk_stall)
 	);
 
 	data_mem data_mem_inst(
@@ -103,5 +106,5 @@ module top (led);
 			.clk_stall(data_clk_stall)
 		);
 
-	assign clk_proc = (data_clk_stall) ? 1'b1 : clk;
+	assign clk_proc = data_clk_stall || intr_clk_stall || clk;
 endmodule

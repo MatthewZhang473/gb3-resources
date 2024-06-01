@@ -40,39 +40,50 @@
  *	RISC-V instruction memory
  */
 
+module instruction_memory (
+    input wire clk,
+    input wire [31:0] addr,
+    output reg [31:0] out,
+    output reg clk_stall
+);
 
+    // Define the states of the FSM
+    localparam IDLE = 0, FETCH = 1;
 
-module instruction_memory(addr, out);
-	input [31:0]		addr;
-	output [31:0]		out;
+    // Instruction memory array
+    reg [31:0] instruction_memory[0:2**10-1]; // Assuming 4K words of memory
 
-	/*
-	 *	Size the instruction memory.
-	 *
-	 *	(Bad practice: The constant should be a `define).
-	 */
-	reg [31:0]		instruction_memory[0:2**12-1];
+    // FSM state variable
+    reg state = IDLE;
 
-	/*
-	 *	According to the "iCE40 SPRAM Usage Guide" (TN1314 Version 1.0), page 5:
-	 *
-	 *		"SB_SPRAM256KA RAM does not support initialization through device configuration."
-	 *
-	 *	The only way to have an initializable memory is to use the Block RAM.
-	 *	This uses Yosys's support for nonzero initial values:
-	 *
-	 *		https://github.com/YosysHQ/yosys/commit/0793f1b196df536975a044a4ce53025c81d00c7f
-	 *
-	 *	Rather than using this simulation construct (`initial`),
-	 *	the design should instead use a reset signal going to
-	 *	modules in the design.
-	 */
-	initial begin
-		/*
-		 *	read from "program.hex" and store the instructions in instruction memory
-		 */
-		$readmemh("verilog/program.hex",instruction_memory);
-	end
+    // Internal address register to hold the previous address
+    reg [31:0] previous_addr;
 
-	assign out = instruction_memory[addr >> 2]; // converts the byte address into a word address by right-shifting it by two bits
+    // Memory initialization (using Yosys's support for nonzero initial values)
+    initial begin
+        $readmemh("verilog/program.hex", instruction_memory);
+        previous_addr = 32'hFFFFFFFF; // Initialize previous address
+        clk_stall = 0; // Initialize clk_stall to 0
+    end
+
+    // FSM to manage instruction fetching based on address change
+    always @(posedge clk) begin
+        case (state)
+            IDLE: begin
+                clk_stall <= 0;
+                if (addr != previous_addr) begin
+                    previous_addr <= addr; // Update the previous address
+                    state <= FETCH; // Move to fetch state if address changes
+					clk_stall <= 1; // Stall the CPU while fetching the instruction
+                end
+            end
+
+            FETCH: begin
+				clk_stall <= 0;
+                out <= instruction_memory[addr >> 2]; // Perform the memory read
+                state <= IDLE; // Go back to idle state
+            end
+        endcase
+    end
+
 endmodule
