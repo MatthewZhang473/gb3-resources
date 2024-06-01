@@ -75,7 +75,8 @@ module alu(ALUctl, A, B, ALUOut, Branch_Enable);
 		Branch_Enable = 1'b0;
 	end
 
-	wire [31:0]		Out;
+	wire [31:0]		adder_result;
+	wire [31:0]		subtractor_result;
 	adder adder (
 		.input1(A),
 		.input2(B),
