@@ -146,3 +146,27 @@ module mem_wb (clk, data_in, data_out);
 		data_out <= data_in;
 	end
 endmodule
+
+// module instr_buffer(clk, data_in, data_out);
+// 	input			clk;
+// 	input [31:0]		data_in;
+// 	output reg[31:0]	data_out;
+
+// 		/*
+// 	 *	The `initial` statement below uses Yosys's support for nonzero
+// 	 *	initial values:
+// 	 *
+// 	 *		https://github.com/YosysHQ/yosys/commit/0793f1b196df536975a044a4ce53025c81d00c7f
+// 	 *
+// 	 *	Rather than using this simulation construct (`initial`),
+// 	 *	the design should instead use a reset signal going to
+// 	 *	modules in the design and to thereby set the values.
+// 	 */
+// 	initial begin
+// 		data_out = 32'b0;
+// 	end
+
+// 	always @(posedge clk) begin
+// 		data_out <= data_in;
+// 	end
+// endmodule

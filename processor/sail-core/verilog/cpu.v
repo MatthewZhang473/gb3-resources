@@ -194,6 +194,14 @@ module cpu(
 			.clk(clk)
 		);
 
+	// // Buffer to store the instruction fetched from the instruction memory
+	// wire [31:0] inst_mem_out_buffer;
+	// instr_buffer inst_buffer(
+	// 		.clk(clk),
+	// 		.data_in(inst_mem_out),
+	// 		.data_out(inst_mem_out_buffer)
+	// 	);
+
 	mux2to1 inst_mux(
 			.input0(inst_mem_out),
 			.input1(32'b0),
