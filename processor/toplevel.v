@@ -47,7 +47,8 @@ module top (led);
 	wire		clk_proc;
 	wire		data_clk_stall;
 	
-	wire		clk;
+	wire		clk_48mhz;
+	wire		clk_16mhz;
 	reg		ENCLKHF		= 1'b1;	// Plock enable
 	reg		CLKHF_POWERUP	= 1'b1;	// Power up the HFOSC circuit
 
@@ -55,11 +56,25 @@ module top (led);
 	/*
 	 *	Use the iCE40's hard primitive for the clock source.
 	 */
-	SB_HFOSC #(.CLKHF_DIV("0b10")) OSCInst0 (
+	SB_HFOSC OSCInst0 (
 		.CLKHFEN(ENCLKHF),
 		.CLKHFPU(CLKHF_POWERUP),
-		.CLKHF(clk)
+		.CLKHF(clk_48mhz)
 	);
+
+	SB_PLL40_CORE #(
+      .FEEDBACK_PATH("SIMPLE"),
+      .PLLOUT_SELECT("GENCLK"),
+      .DIVR(4'b0000),
+      .DIVF(7'b0001101),
+      .DIVQ(3'b101),
+      .FILTER_RANGE(3'b100),
+    ) SB_PLL40_CORE_inst (
+      .RESETB(1'b1),
+      .BYPASS(1'b0),
+      .PLLOUTCORE(clk_16mhz),
+      .REFERENCECLK(clk_48mhz)
+   );
 
 	/*
 	 *	Memory interface
@@ -86,20 +101,13 @@ module top (led);
 		.data_mem_sign_mask(data_sign_mask)
 	);
 
-	reg [31:0] fake_read;
-	reg [31:0] fake_write;
 	instruction_memory inst_mem( 
-		.clk(clk),
 		.addr(inst_in), 
-		.fake_condition(0),
-		.fake_addr(0),
-		.fake_read(fake_read),
-		.fake_write(fake_write),
 		.out(inst_out)
 	);
 
 	data_mem data_mem_inst(
-			.clk(clk),
+			.clk(clk_16mhz),
 			.addr(data_addr),
 			.write_data(data_WrData),
 			.memwrite(data_memwrite), 
@@ -110,5 +118,5 @@ module top (led);
 			.clk_stall(data_clk_stall)
 		);
 
-	assign clk_proc = (data_clk_stall) ? 1'b1 : clk;
+	assign clk_proc = (data_clk_stall) ? 1'b1 : clk_16mhz;
 endmodule
